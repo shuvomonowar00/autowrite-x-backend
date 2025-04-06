@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', 'http://127.0.0.1'),
 
     /*
     |--------------------------------------------------------------------------
@@ -123,4 +123,9 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+
+    /**
+     * Frontend URL
+     */
+    'frontend_url' => env('FRONTEND_URL', 'http://127.0.0.1:5173'),
 ];
