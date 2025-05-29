@@ -1,13 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Article\LongArticleController;
 use App\Http\Controllers\Article\ArticlePublishController;
 use App\Http\Controllers\Client\ClientDashboardController;
 use App\Http\Controllers\Client\ClientProfileManagementController;
 use App\Http\Controllers\Client\ClientSettingsController;
 use App\Http\Controllers\Client\SocialAuthController;
+use App\Http\Controllers\Test\TestController;
+
+// Test route for API
+Route::post('/test', [TestController::class, '__invoke']);
 
 /**
  * Client user all routes
@@ -15,7 +18,10 @@ use App\Http\Controllers\Client\SocialAuthController;
 
 // Client auth routes (public)
 Route::post('/client/register', [ClientProfileManagementController::class, 'clientRegister']);
-Route::post('/client/login', [ClientProfileManagementController::class, 'clientLogin']);
+// Route::post('/client/login', [ClientProfileManagementController::class, 'clientLogin']);
+Route::middleware(['api.protected'])->group(function () {
+    Route::post('/client/login', [ClientProfileManagementController::class, 'clientLogin']);
+});
 // Social authentication routes with web middleware
 Route::middleware(['web'])->group(function () {
     Route::get('/client/login/{provider}', [SocialAuthController::class, 'redirectToProvider']);
@@ -23,15 +29,18 @@ Route::middleware(['web'])->group(function () {
 });
 // Route::get('/client/login/{provider}', [SocialAuthController::class, 'redirectToProvider']);
 // Route::get('/client/login/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback']);
-//Route::post('/client/logout', [ClientProfileManagementController::class, 'clientLogout']);
-Route::middleware(['auth:sanctum,clients', 'remember.duration'])->group(function () {
+Route::middleware(['api.protected', 'remember.duration'])->group(function () {
     Route::post('/client/logout', [ClientProfileManagementController::class, 'clientLogout']);
 });
 
 /**
  * Define a route to fetch all long articles
  */
-Route::middleware(['auth:sanctum,clients'])->group(function () {
+Route::middleware([
+    'api.protected',
+    'auth:sanctum,clients',
+    'client.auth'
+])->group(function () {
     // Check if the client is authenticated route
     Route::get('/client/check-auth', function () {
         return response()->json([

@@ -56,13 +56,28 @@ class ClientDashboardController extends Controller
                 ->get();
 
             // Get platform statistics
+            // $platformStats = DB::table('post_platforms')
+            //     ->leftJoin('long_article_platforms', 'post_platforms.id', '=', 'long_article_platforms.post_platform_id')
+            //     ->leftJoin('long_articles', function ($join) use ($clientId) {
+            //         $join->on('long_articles.id', '=', 'long_article_platforms.long_article_id')
+            //             ->where('long_articles.client_id', '=', $clientId);
+            //     })
+            //     ->select('post_platforms.id', 'post_platforms.platform_name', DB::raw('COUNT(DISTINCT long_article_platforms.long_article_id) as article_count'))
+            //     ->groupBy('post_platforms.id', 'post_platforms.platform_name')
+            //     ->get();
+
+            // Improved query to get platform statistics
             $platformStats = DB::table('post_platforms')
                 ->leftJoin('long_article_platforms', 'post_platforms.id', '=', 'long_article_platforms.post_platform_id')
                 ->leftJoin('long_articles', function ($join) use ($clientId) {
-                    $join->on('long_articles.id', '=', 'long_article_platforms.long_article_id')
+                    $join->on('long_article_platforms.long_article_id', '=', 'long_articles.id')
                         ->where('long_articles.client_id', '=', $clientId);
                 })
-                ->select('post_platforms.id', 'post_platforms.platform_name', DB::raw('COUNT(DISTINCT long_article_platforms.long_article_id) as article_count'))
+                ->select(
+                    'post_platforms.id',
+                    'post_platforms.platform_name',
+                    DB::raw('COUNT(DISTINCT CASE WHEN long_articles.id IS NOT NULL THEN long_article_platforms.long_article_id ELSE NULL END) as article_count')
+                )
                 ->groupBy('post_platforms.id', 'post_platforms.platform_name')
                 ->get();
 

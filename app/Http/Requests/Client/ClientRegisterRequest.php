@@ -58,7 +58,6 @@ class ClientRegisterRequest extends FormRequest
             'password.symbols' => 'Password must contain at least one special character',
             'password_confirmation.required' => 'Please confirm your password',
             'password_confirmation.same' => 'Confirm password does not match with password',
-
         ];
     }
 }

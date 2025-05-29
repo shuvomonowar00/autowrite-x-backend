@@ -27,7 +27,7 @@ class GenerateContentFormRequest extends FormRequest
             'numFAQs' => 'required|integer',
             'gptVersion' => 'required|string|in:gpt-4,gpt-4-turbo,gpt-3.5-turbo',
             'aiGeneratedTitle' => 'required|bool',
-            'wordPressSites' => 'required|array',
+            'wordPressSites' => 'present|array|nullable',
             'wordCount' => 'required|integer|min:750|max:1500',
             'articleType' => 'required|string',
         ];

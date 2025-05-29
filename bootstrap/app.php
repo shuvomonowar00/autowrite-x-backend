@@ -3,6 +3,12 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use App\Http\Middleware\RememberMeDuration;
+use App\Http\Middleware\EnsureUserIsClient;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -22,22 +28,27 @@ return Application::configure(basePath: dirname(__DIR__))
         // ]);
 
         $middleware->alias([
-            'remember.duration' => \App\Http\Middleware\RememberMeDuration::class,
+            'remember.duration' => RememberMeDuration::class,
+            'client.auth' => EnsureUserIsClient::class,
             'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         ]);
 
         // Configure middleware groups
         $middleware->group('web', [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            EnsureFrontendRequestsAreStateful::class,
+            StartSession::class,
+            ShareErrorsFromSession::class,
         ]);
 
         $middleware->group('api', [
-            \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,
             'throttle:api',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \App\Http\Middleware\RememberMeDuration::class,
+            SubstituteBindings::class,
+        ]);
+
+        $middleware->group('api.protected', [
+            EnsureFrontendRequestsAreStateful::class,
+            'throttle:api',
+            RememberMeDuration::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -63,6 +63,52 @@ class ClientProfileManagementController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+
+
+        // try {
+        //     // Log the start of the registration process
+        //     Log::info('Client registration started.');
+
+        //     // Validate the request
+        //     $validated_data = $request->validated();
+        //     Log::info('Validated data: ', $validated_data);
+
+        //     // Create new client
+        //     $client = Client::create([
+        //         'first_name' => $validated_data['first_name'],
+        //         'last_name' => $validated_data['last_name'],
+        //         'profile_photo' => null,
+        //         'username' => $validated_data['username'],
+        //         'email' => $validated_data['email'],
+        //         'password' => Hash::make($validated_data['password']),
+        //         'verification_token' => Str::random(64),
+        //         'verification_deadline' => Carbon::now()->addHours(24),
+        //     ]);
+
+        //     if (!$client) {
+        //         throw new Exception('Failed to create client');
+        //     }
+        //     // Log the created client
+        //     Log::info('Client created successfully: ', $client->toArray());
+
+        //     // Send verification email (if enabled)
+        //     // Mail::to($client->email)->send(new VerificationEmail($client));
+        //     Log::info('Verification email sent to: ' . $client->email);
+
+        //     return response()->json([
+        //         'message' => 'Registration successful. Please check your email to verify your account.',
+        //         'client' => $client
+        //     ], 200);
+        // } catch (Exception $e) {
+        //     // Log the exception details
+        //     Log::error('Client registration failed: ' . $e->getMessage());
+        //     Log::error('Stack trace: ' . $e->getTraceAsString());
+
+        //     return response()->json([
+        //         'message' => 'Registration failed',
+        //         'error' => $e->getMessage()
+        //     ], 500);
+        // }
     }
 
 
@@ -200,6 +246,12 @@ class ClientProfileManagementController extends Controller
             // Get remember value
             $remember = $request->boolean('remember_me', false);
             Log::info('Using remember value: ' . ($remember ? 'true' : 'false'));
+
+            // Debug information
+            Log::info('Request headers:', $request->headers->all());
+            Log::info('Request host:', [$request->getHost()]);
+            Log::info('Request origin:', [$request->header('origin')]);
+            Log::info('Has session:', [$request->hasSession()]);
 
             // Attempt login
             Auth::guard('clients')->login($client, $remember);
